@@ -45,13 +45,6 @@ pub struct Code {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct Image {
-    pub link: String,
-    pub alt: String,
-    pub tittle: String,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
 pub struct TableRow(Vec<String>);
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -76,8 +69,6 @@ pub enum BasicItem {
     HLine,
     /// Surround by `<!--` `-->`
     Comment(String),
-    /// Use `![]()`
-    Image(Image),
     /// Use `$$ $$`
     Latex(String),
     /// Table

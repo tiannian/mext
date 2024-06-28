@@ -1,11 +1,10 @@
-use std::collections::HashMap;
-
 use serde::{Deserialize, Serialize};
 
 use super::BasicItem;
 
-#[derive(Debug, Serialize, Deserialize)]
+/// Markdown document
+#[derive(Debug, Serialize, Deserialize, Default)]
 pub struct Document {
-    pub attrs: HashMap<String, String>,
+    pub attrs: Vec<(String, String)>,
     pub items: Vec<BasicItem>,
 }

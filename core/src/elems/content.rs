@@ -1,6 +1,11 @@
 use serde::{Deserialize, Serialize};
 
-use super::Image;
+#[derive(Debug, Serialize, Deserialize)]
+pub struct Image {
+    pub link: String,
+    pub alt: String,
+    pub tittle: String,
+}
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Hyperlink {
