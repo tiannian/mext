@@ -2,7 +2,7 @@ use std::io::{BufRead, BufReader, Read};
 
 use anyhow::{anyhow, Result};
 
-use crate::elems::Document;
+use crate::elems::{BasicItem, Document};
 
 #[derive(Debug, PartialEq, Eq)]
 pub enum ParserState {
@@ -69,7 +69,11 @@ impl MarkdownParser {
 
                 self.document.attrs.push((key.into(), value.into()));
                 self.read_new_line = true;
-            } else if self.state == ParserState::Begin && utils::is_header(&self.buffer) {
+            } else if self.state == ParserState::Begin && utils::is_tittle(&self.buffer) {
+                let tittle = utils::parse_tittle(&self.buffer)?;
+
+                self.document.items.push(BasicItem::Tittle(tittle));
+                self.read_new_line = true;
             }
         }
     }
@@ -80,20 +84,53 @@ impl MarkdownParser {
 }
 
 mod utils {
-    pub fn is_header(s: &str) -> bool {
-        true
+    use anyhow::{anyhow, Result};
+    use once_cell::sync::Lazy;
+    use regex::Regex;
+
+    use crate::elems::Tittle;
+
+    static TITTLE_RE: Lazy<Regex> =
+        Lazy::new(|| Regex::new(r"(#+)\s(.*)").expect("Failed to create regex"));
+
+    pub fn is_tittle(s: &str) -> bool {
+        TITTLE_RE.is_match(s)
+    }
+
+    pub fn parse_tittle(s: &str) -> Result<Tittle> {
+        let caps = TITTLE_RE.captures(s).ok_or(anyhow!("Failed to match"))?;
+
+        let index_s = caps
+            .get(1)
+            .ok_or(anyhow!("Failed to get index"))?
+            .as_str()
+            .trim();
+        let tittle = caps
+            .get(2)
+            .ok_or(anyhow!("Failed to get tittle"))?
+            .as_str()
+            .into();
+
+        Ok(Tittle {
+            level: index_s.len() as u8,
+            tittle,
+        })
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use crate::{tests, MarkdownParser};
+    use crate::{
+        elems::{BasicItem, Tittle},
+        tests, MarkdownParser,
+    };
 
     #[test]
     fn test_attr() {
         tests::init();
 
-        let document = "---
+        let document = "
+---
 key1: value1
 key2: value2
 ---
@@ -109,5 +146,24 @@ key2: value2
         assert_eq!(doc.attrs[0].1, "value1");
         assert_eq!(doc.attrs[1].0, "key2");
         assert_eq!(doc.attrs[1].1, "value2");
+    }
+
+    #[test]
+    fn test_tittle() {
+        tests::init();
+
+        let document = "### Header 3";
+
+        let mut parser = MarkdownParser::default();
+        parser.parse_markdown(document.as_bytes()).unwrap();
+
+        let doc = parser.document();
+
+        let expect = BasicItem::Tittle(Tittle {
+            level: 3,
+            tittle: "Header 3".into(),
+        });
+
+        assert_eq!(doc.items[0], expect);
     }
 }

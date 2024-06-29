@@ -1,13 +1,13 @@
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
 pub struct Image {
     pub link: String,
     pub alt: String,
     pub tittle: String,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
 pub struct Hyperlink {
     pub name: String,
     pub url: String,
@@ -19,21 +19,21 @@ pub struct Hyperlink {
 /// Each section can be empty,
 /// year can be empty: `09/19`
 /// day can be empty `2024/09`
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
 pub struct Date {
     pub year: Option<u16>,
     pub month: Option<u8>,
     pub day: Option<u8>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
 pub struct Time {
     pub hour: Option<u8>,
     pub minute: Option<u8>,
     pub second: Option<u8>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
 pub enum TimeDate {
     /// Date: `2024/06/29` or `2024-06-29`
     Date(Date),
@@ -43,7 +43,7 @@ pub enum TimeDate {
     DateTime(Date, Time),
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
 pub enum InlineCode {
     /// `rgb(0,0,0)` or `#ffffff`
     Color(u8, u8, u8),
@@ -51,7 +51,7 @@ pub enum InlineCode {
     TimeConjob(String),
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
 pub enum LineContent {
     Text(String),
     /// Use `**bold**` or `__blod__`
@@ -80,7 +80,7 @@ pub enum LineContent {
     Reference(String, String),
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
 pub struct Content {
     pub contents: LineContent,
 }

@@ -11,26 +11,25 @@ use super::Content;
 /// ## Header 2
 /// ### Header 3
 /// ```
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
 pub struct Tittle {
     pub level: u8,
-    pub index: u16,
     pub tittle: String,
 }
 
 /// Paragraph of document
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
 pub struct Paragraph {
     pub lines: Vec<Content>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
 pub enum QouteItem {
     Content(String),
     Qoute(Box<QouteItem>),
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
 pub enum ListItem {
     Ordered(String, Vec<ListItem>),
     Plus(String, Vec<ListItem>),
@@ -38,22 +37,22 @@ pub enum ListItem {
     Star(String, Vec<ListItem>),
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
 pub struct Code {
     pub attr: String,
     pub content: String,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
 pub struct TableRow(Vec<String>);
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
 pub struct Table {
     pub header: Vec<String>,
     pub rows: Vec<TableRow>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
 pub enum BasicItem {
     /// Tittle begin with `# `
     Tittle(Tittle),
