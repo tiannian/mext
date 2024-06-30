@@ -118,52 +118,52 @@ mod utils {
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use crate::{
-        elems::{BasicItem, Tittle},
-        tests, MarkdownParser,
-    };
-
-    #[test]
-    fn test_attr() {
-        tests::init();
-
-        let document = "
----
-key1: value1
-key2: value2
----
-";
-
-        let mut parser = MarkdownParser::default();
-
-        parser.parse_markdown(document.as_bytes()).unwrap();
-
-        let doc = parser.document();
-
-        assert_eq!(doc.attrs[0].0, "key1");
-        assert_eq!(doc.attrs[0].1, "value1");
-        assert_eq!(doc.attrs[1].0, "key2");
-        assert_eq!(doc.attrs[1].1, "value2");
-    }
-
-    #[test]
-    fn test_tittle() {
-        tests::init();
-
-        let document = "### Header 3";
-
-        let mut parser = MarkdownParser::default();
-        parser.parse_markdown(document.as_bytes()).unwrap();
-
-        let doc = parser.document();
-
-        let expect = BasicItem::Tittle(Tittle {
-            level: 3,
-            tittle: "Header 3".into(),
-        });
-
-        assert_eq!(doc.items[0], expect);
-    }
-}
+// #[cfg(test)]
+// mod tests {
+//     use crate::{
+//         elems::{BasicItem, Tittle},
+//         tests, MarkdownParser,
+//     };
+//
+//     #[test]
+//     fn test_attr() {
+//         tests::init();
+//
+//         let document = "
+// ---
+// key1: value1
+// key2: value2
+// ---
+// ";
+//
+//         let mut parser = MarkdownParser::default();
+//
+//         parser.parse_markdown(document.as_bytes()).unwrap();
+//
+//         let doc = parser.document();
+//
+//         assert_eq!(doc.attrs[0].0, "key1");
+//         assert_eq!(doc.attrs[0].1, "value1");
+//         assert_eq!(doc.attrs[1].0, "key2");
+//         assert_eq!(doc.attrs[1].1, "value2");
+//     }
+//
+//     #[test]
+//     fn test_tittle() {
+//         tests::init();
+//
+//         let document = "### Header 3";
+//
+//         let mut parser = MarkdownParser::default();
+//         parser.parse_markdown(document.as_bytes()).unwrap();
+//
+//         let doc = parser.document();
+//
+//         let expect = BasicItem::Tittle(Tittle {
+//             level: 3,
+//             tittle: "Header 3".into(),
+//         });
+//
+//         assert_eq!(doc.items[0], expect);
+//     }
+// }

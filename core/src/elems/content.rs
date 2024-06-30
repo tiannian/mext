@@ -49,10 +49,11 @@ pub enum InlineCode {
     Color(u8, u8, u8),
     TimeDate(TimeDate),
     TimeConjob(String),
+    Text(String),
 }
 
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
-pub enum LineContent {
+pub enum Content {
     Text(String),
     /// Use `**bold**` or `__blod__`
     Bold(String),
@@ -80,7 +81,32 @@ pub enum LineContent {
     Reference(String, String),
 }
 
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
-pub struct Content {
-    pub contents: LineContent,
-}
+// mod utils {
+//     use once_cell::sync::{Lazy, OnceCell};
+//     use regex::RegexSet;
+//
+//     const BOLD_RE: &str = r"\*\*(.*?)\*\*|\_\_(.*?)\_\_";
+//     const LTALIC_RE: &str = r"\*(.*?)\*|\_(.*?)\_";
+//     const DELETE_RE: &str = r"~~(.*?)~~";
+//     const IMAGE_RE: &str = r"!\[(.*?)\]\((.*?)\)";
+//     const HYPERLINK_RE: &str = r"\[(.*)\]\((.*?)\)";
+//     const LATEX_RE: &str = r"\$(.*)\$";
+//     const CODE_RE: &str = r"`(.*)`";
+//
+//     pub fn parse() {
+//         static RE: Lazy<RegexSet> = Lazy::new(|| {
+//             RegexSet::new([
+//                 BOLD_RE,
+//                 LTALIC_RE,
+//                 DELETE_RE,
+//                 IMAGE_RE,
+//                 HYPERLINK_RE,
+//                 LATEX_RE,
+//                 CODE_RE,
+//             ])
+//             .unwrap()
+//         });
+//
+//         // RE.ma
+//     }
+// }

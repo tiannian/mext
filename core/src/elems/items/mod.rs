@@ -2,20 +2,8 @@ use serde::{Deserialize, Serialize};
 
 use super::Content;
 
-/// The tittle of document
-///
-/// For example:
-///
-/// ```markdown
-/// # Header 1
-/// ## Header 2
-/// ### Header 3
-/// ```
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
-pub struct Tittle {
-    pub level: u8,
-    pub tittle: String,
-}
+mod tittle;
+pub use tittle::*;
 
 /// Paragraph of document
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
