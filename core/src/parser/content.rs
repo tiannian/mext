@@ -1,5 +1,4 @@
 use anyhow::{anyhow, Result};
-use log::warn;
 use once_cell::sync::Lazy;
 use regex::Regex;
 
@@ -35,6 +34,7 @@ impl<'s> ContentParser<'s> {
                 }
                 '_' => {
                     let advance = self.parse_bold_or_ltalic()?;
+                    return Ok(idx + advance);
                 }
                 _ => {
                     s.push(c);
