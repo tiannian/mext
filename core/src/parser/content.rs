@@ -2,7 +2,7 @@ use anyhow::{anyhow, Result};
 use once_cell::sync::Lazy;
 use regex::Regex;
 
-use crate::elems::Content;
+use crate::elems::{Content, Image};
 
 #[derive(Debug)]
 pub struct ContentParser<'s> {
@@ -29,12 +29,16 @@ impl<'s> ContentParser<'s> {
 
             match c {
                 '*' => {
-                    let advance = self.parse_bold_or_ltalic()?;
-                    return Ok(idx + advance);
+                    return self.parse_bold_or_ltalic();
                 }
                 '_' => {
-                    let advance = self.parse_bold_or_ltalic()?;
-                    return Ok(idx + advance);
+                    return self.parse_bold_or_ltalic();
+                }
+                '~' => {
+                    return self.parse_delete();
+                }
+                '!' => {
+                    return self.parse_image();
                 }
                 _ => {
                     s.push(c);
@@ -72,6 +76,39 @@ impl<'s> ContentParser<'s> {
             }
             (None, None) => Err(anyhow!("No bold or ltalic found")),
         }
+    }
+
+    pub fn parse_delete(&mut self) -> Result<usize> {
+        static DELETE_RE: Lazy<Regex> =
+            Lazy::new(|| Regex::new(r"~~(.*?)~~").expect("Failed to inital delete regex"));
+
+        let cap = DELETE_RE
+            .captures(self.origin_str)
+            .ok_or(anyhow!("Failed to match delete"))?;
+
+        let m = cap.get(1).ok_or(anyhow!("Failed to get delete content"))?;
+        self.contents.push(Content::Delete(m.as_str().into()));
+
+        Ok(m.end() + 2)
+    }
+
+    pub fn parse_image(&mut self) -> Result<usize> {
+        static RE: Lazy<Regex> = Lazy::new(|| {
+            Regex::new(r"!\[(.*?)\]\((.*?)(\))").expect("Failed to inital image regex")
+        });
+
+        let cap = RE
+            .captures(self.origin_str)
+            .ok_or(anyhow!("Failed to match image"))?;
+
+        let alt = cap.get(1).map(|t| t.as_str().into()).unwrap_or_default();
+        let link = cap.get(2).map(|t| t.as_str().into()).unwrap_or_default();
+
+        self.contents.push(Content::Image(Image { link, alt }));
+
+        let m = cap.get(3).ok_or(anyhow!("Failed to match image"))?;
+
+        Ok(m.end())
     }
 }
 
@@ -114,7 +151,10 @@ fn parse_ltalic(s: &str) -> Option<(Content, usize, usize)> {
 
 #[cfg(test)]
 mod tests {
-    use crate::{elems::Content, tests};
+    use crate::{
+        elems::{Content, Image},
+        tests,
+    };
 
     use super::ContentParser;
 
@@ -130,7 +170,6 @@ mod tests {
         let mut parser = ContentParser::new(s);
 
         let idx = parser.parse_bold_or_ltalic().unwrap();
-        println!("{:?}", parser.contents[0]);
         assert_eq!(idx, expected_idx);
         assert_eq!(parser.contents[0], Content::Ltalic(expected_s.into()));
     }
@@ -140,8 +179,8 @@ mod tests {
         tests::init();
 
         test_parse_bold("**abcd asdas **", 15, "abcd asdas ");
-        test_parse_bold("** **", 5, " ");
-        test_parse_bold("****", 4, "");
+        test_parse_bold("aa** **", 7, " ");
+        test_parse_bold("a****", 5, "");
         test_parse_bold("**abcd asdas ****asdasd**", 15, "abcd asdas ");
 
         test_parse_bold("__abcd asdas __", 15, "abcd asdas ");
@@ -153,5 +192,39 @@ mod tests {
         test_parse_latlic("* *", 3, " ");
         test_parse_latlic("**", 2, "");
         test_parse_latlic("*abcd asdas **asdasd**", 13, "abcd asdas ");
+    }
+
+    fn parse_delete(s: &str, expected_idx: usize, expected_s: &str) {
+        let mut parser = ContentParser::new(s);
+
+        let idx = parser.parse_delete().unwrap();
+        assert_eq!(idx, expected_idx);
+        assert_eq!(parser.contents[0], Content::Delete(expected_s.into()));
+    }
+
+    #[test]
+    fn test_delete() {
+        parse_delete("~~abc ~~", 8, "abc ");
+        parse_delete("~~~~ ~~", 4, "");
+    }
+
+    fn parse_image(s: &str, expected_idx: usize, link: &str, alt: &str) {
+        let mut parser = ContentParser::new(s);
+
+        let idx = parser.parse_image().unwrap();
+        assert_eq!(idx, expected_idx);
+        assert_eq!(
+            parser.contents[0],
+            Content::Image(Image {
+                link: link.into(),
+                alt: alt.into()
+            })
+        );
+    }
+
+    #[test]
+    fn test_image() {
+        parse_image("![]()", 5, "", "");
+        parse_image("![asd](asd)", 11, "asd", "asd");
     }
 }

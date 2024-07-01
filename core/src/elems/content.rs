@@ -4,14 +4,12 @@ use serde::{Deserialize, Serialize};
 pub struct Image {
     pub link: String,
     pub alt: String,
-    pub tittle: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
 pub struct Hyperlink {
     pub name: String,
     pub url: String,
-    pub tittle: String,
 }
 
 /// Date: `2024/06/29` or `2024-06-29`
